@@ -94,6 +94,7 @@ const Login = () => {
         <h2 className="text-5xl font-bold">MyClickBook</h2>
         <p className="text-indigo-100 text-lg">Manage your business with ease</p>
       </div>
+    </div>
     </>
   )
 }

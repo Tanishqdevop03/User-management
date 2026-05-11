@@ -127,7 +127,7 @@ const User = () => {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <Sidebar />
 
-      <div className="w-full md:ml-65">
+      <div className="w-full md:ml-[260px]">
         <Navbar />
 
         <div className="p-4 md:p-8 pt-16 md:pt-8">

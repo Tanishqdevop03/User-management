@@ -21,7 +21,7 @@ const Sidebar = () => {
     <div className="w-65 h-screen bg-[#0f172a] text-white p-6 flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-10">
-          <h1 className="text-2xl font-bold">Mybillbook</h1>
+          <h1 className="text-2xl font-bold">MyClickBook</h1>
           <button onClick={() => setOpen(false)} className="md:hidden text-gray-400 hover:text-white">
             <X size={20} />
           </button>

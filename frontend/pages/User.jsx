@@ -3,6 +3,7 @@ import { Pencil, Trash2, X, UserPlus, Search } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import API from "../api/axios";
+import Toast from "../components/Toast";
 
 const EMPTY_FORM = { fullName: "", email: "", role: "Viewer", status: "Active", location: "", phone: "" };
 
@@ -50,7 +51,10 @@ const User = () => {
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState(null);
   const usersPerPage = 6;
+
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   const getUsers = async () => {
     try {
@@ -78,13 +82,15 @@ const User = () => {
     try {
       if (editingUser) {
         await API.put(`/users/${editingUser._id}`, form);
+        showToast("User updated successfully!");
       } else {
         await API.post("/users/signup", form);
+        showToast("User added successfully!");
       }
       setShowModal(false);
       getUsers();
     } catch (error) {
-      console.log(error);
+      showToast(error.response?.data?.message || "Something went wrong.", "error");
     }
     setLoading(false);
   };
@@ -92,10 +98,11 @@ const User = () => {
   const handleDelete = async () => {
     try {
       await API.delete(`/users/${deleteTarget._id}`);
+      showToast("User deleted successfully!");
       setDeleteTarget(null);
       getUsers();
     } catch (error) {
-      console.log(error);
+      showToast("Failed to delete user.", "error");
     }
   };
 
@@ -117,6 +124,7 @@ const User = () => {
 
   return (
     <div className="flex bg-[#f5f7fb] min-h-screen">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <Sidebar />
 
       <div className="w-full md:ml-65">

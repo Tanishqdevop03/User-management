@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import {useNavigate, Link} from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import API from '../api/axios';
+import Toast from '../components/Toast';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -11,6 +12,9 @@ const Login = () => {
         password : ""
     });
     const [showPassword, setShowPassword] = useState(false);
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = "success") => setToast({ message, type });
 
     const handleChange = (e) => {
         setFormData({...formData, [e.target.name] : e.target.value});
@@ -19,20 +23,19 @@ const Login = () => {
         e.preventDefault();
 
         try{
-            const {data} = await API.post(
-                "/auth/login",
-                formData
-            );
+            const {data} = await API.post("/auth/login", formData);
             localStorage.setItem("token", data.token);
-
-            navigate("/dashboard");
+            showToast("Login successful! Redirecting...");
+            setTimeout(() => navigate("/dashboard"), 1000);
         }
         catch (error) {
-          console.log(error);
+          showToast(error.response?.data?.message || "Login failed. Please try again.", "error");
         }
     }
   return (
-    <div className="grid md:grid-cols-2 min-h-screen">
+    <>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      <div className="grid md:grid-cols-2 min-h-screen">
       <div className="flex justify-center items-center bg-[#f5f7fb] px-6">
         <div className="bg-white w-full max-w-md p-10 rounded-2xl shadow-lg">
           <h1 className="text-3xl font-bold text-gray-800 mb-1">Welcome back</h1>
@@ -91,7 +94,7 @@ const Login = () => {
         <h2 className="text-5xl font-bold">MyClickBook</h2>
         <p className="text-indigo-100 text-lg">Manage your business with ease</p>
       </div>
-    </div>
+    </>
   )
 }
 

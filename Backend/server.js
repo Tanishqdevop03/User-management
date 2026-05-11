@@ -15,7 +15,7 @@ const app = express();
 
 app.use(cors(
   {
-    origin: "https://user-management-fawn-five.vercel.app/",
+    origin: "https://user-management-fawn-five.vercel.app",
     credentials: true,
   }
 ));

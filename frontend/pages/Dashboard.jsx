@@ -7,7 +7,6 @@ import API from "../api/axios";
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const getUsers = async () => {
     try {
       const { data } = await API.get("/users/getuser");

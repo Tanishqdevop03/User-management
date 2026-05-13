@@ -52,6 +52,7 @@ const User = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [toast, setToast] = useState(null);
+  const [roleFilter, setRoleFilter] = useState(null);
   const usersPerPage = 6;
 
   const showToast = (message, type = "success") => setToast({ message, type });
@@ -106,10 +107,11 @@ const User = () => {
     }
   };
 
-  const filtered = users.filter((u) =>
-    u.fullName?.toLowerCase().includes(search.toLowerCase()) ||
-    u.email?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = users.filter((u) => {
+    const matchesSearch = u.fullName?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = roleFilter ? u.role === roleFilter : true;
+    return matchesSearch && matchesRole;
+  });
 
   // Pagination logic
   const totalPages = Math.ceil(filtered.length / usersPerPage);
@@ -117,10 +119,7 @@ const User = () => {
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filtered.slice(indexOfFirstUser, indexOfLastUser);
 
-  // Reset to page 1 when search changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search]);
+  useEffect(() => { setCurrentPage(1); }, [search, roleFilter]);
 
   return (
     <div className="flex bg-[#f5f7fb] min-h-screen">
@@ -151,18 +150,26 @@ const User = () => {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
             {[
-              { label: "Total Users", value: users.length, color: "text-indigo-600", bg: "bg-indigo-50" },
-              { label: "Active", value: users.filter((u) => u.status === "Active").length, color: "text-green-600", bg: "bg-green-50" },
-              { label: "Inactive", value: users.filter((u) => u.status === "Inactive").length, color: "text-red-500", bg: "bg-red-50" },
-              { label: "Admins", value: users.filter((u) => u.role === "Admin").length, color: "text-purple-600", bg: "bg-purple-50" },
+              { label: "Total Users", value: users.length, color: "text-indigo-600", bg: "bg-indigo-50", filter: null },
+              { label: "Active", value: users.filter((u) => u.status === "Active").length, color: "text-green-600", bg: "bg-green-50", filter: null },
+              { label: "Inactive", value: users.filter((u) => u.status === "Inactive").length, color: "text-red-500", bg: "bg-red-50", filter: null },
+              { label: "Admins", value: users.filter((u) => u.role === "Admin").length, color: "text-purple-600", bg: "bg-purple-50", filter: "Admin" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-white rounded-2xl p-4 md:p-5 shadow-sm">
+              <div
+                key={stat.label}
+                onClick={() => setRoleFilter(roleFilter === stat.filter && stat.filter !== null ? null : stat.filter)}
+                className={`bg-white rounded-2xl p-4 md:p-5 shadow-sm transition ${
+                  stat.filter ? "cursor-pointer hover:shadow-md" : ""
+                } ${
+                  roleFilter === stat.filter && stat.filter !== null ? "ring-2 ring-purple-400" : ""
+                }`}
+              >
                 <p className="text-gray-400 text-xs md:text-sm">{stat.label}</p>
                 <p className={`text-2xl md:text-3xl font-bold mt-1 md:mt-2 ${stat.color}`}>{stat.value}</p>
+                {stat.filter && <p className="text-xs text-gray-400 mt-1">{roleFilter === stat.filter ? "Click to clear" : "Click to filter"}</p>}
               </div>
             ))}
           </div>
-
           {/* Search */}
           <div className="relative mb-4 md:mb-5 w-full md:max-w-sm">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
